@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#F5F7FB;font-family:'DM Sans',system-ui,sans-serif;min-height:100vh}
+    a,a:hover{color:inherit;text-decoration:none}
+    input,button,select{font-family:inherit}
+    input:focus{outline:2px solid #16204D;outline-offset:2px}
+    button:active{opacity:0.85;transform:scale(0.98)}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.12);opacity:0.7}}
+    @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes popIn{0%{transform:scale(0.6);opacity:0}75%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+    @keyframes fall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(90px) rotate(540deg);opacity:0}}
+  </style>
+</helmet>
+
+<!-- ROOT WRAPPER -->
+<div style="{{ rootStyle }}">
+
+  <!-- ══════ DESKTOP TOP NAV ══════ -->
+  <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ false }}">
+    <header style="position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid #E8EDF5;height:68px;display:flex;align-items:center;padding:0 24px;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0" onClick="{{ goHome }}">
+        <img src="logo-mark.png" style="height:44px;object-fit:contain" alt="BillPayBox">
+        <img src="logo-wordmark.png" style="height:24px;object-fit:contain" alt="BillPayBox">
+      </div>
+      <nav style="display:flex;align-items:center;gap:2px;margin:0 auto;flex-shrink:1;min-width:0">
+        <button onClick="{{ goHome }}" style="{{ dNavHome }}">Home</button>
+        <button onClick="{{ goPay }}" style="{{ dNavPay }}">Pay Bill</button>
+        <button onClick="{{ goOffers }}" style="{{ dNavOffers }}">Rewards</button>
+        <button onClick="{{ goDash }}" style="{{ dNavDash }}">Account</button>
+      </nav>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <div style="display:{{ feePillDisplay }};align-items:center;gap:6px;background:#FFF0F5;border:1.5px solid rgba(217,20,86,0.35);border-radius:20px;padding:5px 12px;white-space:nowrap">
+          <div style="width:6px;height:6px;border-radius:50%;background:#FF4D8A;animation:pulse 1.6s ease infinite;flex-shrink:0"></div>
+          <span style="font-size:11px;font-weight:700;color:#D91456;letter-spacing:0.03em;white-space:nowrap">₹0 FEE ON ₹299+</span>
+        </div>
+        <button onClick="{{ goDash }}" style="padding:10px 20px;border-radius:24px;border:none;background:linear-gradient(135deg,#16204D,#1C2B6E);color:#fff;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">Sign In</button>
+      </div>
+    </header>
+  </sc-if>
+
+  <!-- ══════ MOBILE TOP BAR ══════ -->
+  <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+    <sc-if value="{{ showTopBar }}" hint-placeholder-val="{{ true }}">
+      <header style="position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #E8EDF5;height:56px;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0">
+        <sc-if value="{{ showBack }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ goBack }}" style="width:36px;height:36px;border-radius:18px;border:none;background:#F1F5F9;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16204D" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>
+          </button>
+        </sc-if>
+        <sc-if value="{{ showLogo }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:7px">
+            <img src="logo-mark.png" style="height:36px;object-fit:contain" alt="BillPayBox">
+            <img src="logo-wordmark.png" style="height:20px;object-fit:contain" alt="BillPayBox">
+          </div>
+        </sc-if>
+        <sc-if value="{{ showBack }}" hint-placeholder-val="{{ false }}">
+          <span style="font-size:15px;font-weight:700;color:#16204D">{{ screenTitle }}</span>
+        </sc-if>
+        <div style="flex:1"></div>
+        <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ goDash }}" style="padding:6px 14px;border-radius:20px;border:2px solid #16204D;background:transparent;color:#16204D;font-size:13px;font-weight:700;cursor:pointer">Sign In</button>
+        </sc-if>
+      </header>
+    </sc-if>
+  </sc-if>
+
+  <!-- ══════ MAIN CONTENT ══════ -->
+  <div style="{{ mainStyle }}">
+
+    <!-- ═══ HOME ═══ -->
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:slideUp 0.3s ease">
+
+        <!-- DESKTOP HERO -->
+        <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ false }}">
+          <div style="background:linear-gradient(135deg,#16204D 0%,#1C2B6E 55%,#2A1250 100%);position:relative;overflow:hidden">
+            <div style="position:absolute;top:-80px;right:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(217,20,86,0.22) 0%,transparent 70%);pointer-events:none"></div>
+            <div style="position:absolute;bottom:-60px;left:30%;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(217,20,86,0.1) 0%,transparent 70%);pointer-events:none"></div>
+            <div style="max-width:1200px;margin:0 auto;padding:72px 48px;display:grid;grid-template-columns:1fr 460px;gap:64px;align-items:center">
+              <!-- Left: headline -->
+              <div>
+                <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(217,20,86,0.18);border:1px solid rgba(217,20,86,0.45);border-radius:20px;padding:6px 16px;margin-bottom:24px">
+                  <div style="width:7px;height:7px;border-radius:50%;background:#FF4D8A;animation:pulse 1.6s ease infinite"></div>
+                  <span style="font-size:12px;font-weight:700;color:#FFA0C0;letter-spacing:0.06em">₹0 CONVENIENCE FEE ON BILLS ₹299+</span>
+                </div>
+                <h1 style="font-size:56px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:16px;text-wrap:pretty">One Place.<br>All Your Bills.</h1>
+                <p style="font-size:18px;color:rgba(255,255,255,0.65);line-height:1.65;margin-bottom:36px;max-width:480px">Pay postpaid mobile &amp; broadband bills — zero convenience fee on qualifying amounts. Earn exclusive brand rewards every time.</p>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:40px">
+                  <button onClick="{{ selectMobile }}" style="display:flex;align-items:center;gap:10px;padding:16px 28px;border-radius:14px;background:#fff;border:none;cursor:pointer;font-size:15px;font-weight:800;color:#16204D">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16204D" stroke-width="2.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                    Pay Mobile Bill
+                  </button>
+                  <button onClick="{{ selectBB }}" style="display:flex;align-items:center;gap:10px;padding:16px 28px;border-radius:14px;background:linear-gradient(135deg,#D91456,#FF2070);border:none;cursor:pointer;font-size:15px;font-weight:800;color:#fff">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                    Pay Broadband Bill
+                  </button>
+                </div>
+                <div style="display:flex;gap:28px">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:32px;height:32px;border-radius:16px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <span style="font-size:13px;color:rgba(255,255,255,0.6)">RBI Licensed</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:32px;height:32px;border-radius:16px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <span style="font-size:13px;color:rgba(255,255,255,0.6)">256-bit SSL</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:32px;height:32px;border-radius:16px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><polyline points="22 11.08 12 2.01 1.99 11.07"></polyline><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
+                    <span style="font-size:13px;color:rgba(255,255,255,0.6)">PCI DSS</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Right: pay widget -->
+              <div style="background:#fff;border-radius:24px;padding:32px;box-shadow:0 24px 64px rgba(0,0,0,0.25)">
+                <h3 style="font-size:18px;font-weight:800;color:#16204D;margin-bottom:20px">Pay a Bill</h3>
+                <div style="display:flex;background:#F1F5F9;border-radius:12px;padding:4px;margin-bottom:20px">
+                  <button onClick="{{ selectMobile }}" style="{{ toggleMobileStyle }}">Postpaid Mobile</button>
+                  <button onClick="{{ selectBB }}" style="{{ toggleBBStyle }}">Broadband</button>
+                </div>
+                <div style="margin-bottom:14px">
+                  <label style="font-size:12px;font-weight:700;color:#16204D;display:block;margin-bottom:6px;letter-spacing:0.04em">{{ phoneLabel }}</label>
+                  <input type="tel" placeholder="{{ phonePH }}" onChange="{{ onMobileChange }}" value="{{ mobile }}" style="width:100%;padding:13px 16px;border-radius:10px;border:2px solid #E2E8F0;font-size:15px;color:#16204D;background:#fff">
+                </div>
+                <div style="margin-bottom:14px">
+                  <label style="font-size:12px;font-weight:700;color:#16204D;display:block;margin-bottom:6px;letter-spacing:0.04em">Bill Amount (₹)</label>
+                  <div style="position:relative">
+                    <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:18px;color:#94A3B8;font-weight:600;pointer-events:none">₹</span>
+                    <input type="number" placeholder="0" onChange="{{ onAmtChange }}" value="{{ billAmount }}" style="width:100%;padding:13px 16px;padding-left:34px;border-radius:10px;border:2px solid #E2E8F0;font-size:20px;font-weight:700;color:#16204D;background:#fff">
+                  </div>
+                  <p style="{{ feeNoteStyle }}">{{ feeNote }}</p>
+                </div>
+                <div style="margin-bottom:20px">
+                  <label style="font-size:12px;font-weight:700;color:#16204D;display:block;margin-bottom:8px;letter-spacing:0.04em">Operator</label>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    <sc-for list="{{ opPills }}" as="op" hint-placeholder-count="5">
+                      <button onClick="{{ op.click }}" style="{{ op.style }}">{{ op.name }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+                <button onClick="{{ submitForm }}" style="{{ proceedStyle }}">Continue to Pay →</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- MOBILE HERO -->
+        <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+          <div style="background:linear-gradient(135deg,#16204D 0%,#1C2B6E 55%,#2A1250 100%);padding:32px 20px 28px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:-30px;right:-30px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(217,20,86,0.28) 0%,transparent 70%);pointer-events:none"></div>
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(217,20,86,0.18);border:1px solid rgba(217,20,86,0.45);border-radius:20px;padding:5px 12px;margin-bottom:18px">
+              <div style="width:7px;height:7px;border-radius:50%;background:#FF4D8A;animation:pulse 1.6s ease infinite"></div>
+              <span style="font-size:11px;font-weight:700;color:#FFA0C0;letter-spacing:0.05em">₹0 CONVENIENCE FEE ON BILLS ₹299+</span>
+            </div>
+            <h1 style="font-size:30px;font-weight:900;color:#fff;line-height:1.15;margin-bottom:10px">One Place.<br>All Your Bills.</h1>
+            <p style="font-size:14px;color:rgba(255,255,255,0.65);margin-bottom:24px;line-height:1.6">Pay postpaid mobile &amp; broadband bills.<br>Save the fee. Earn brand rewards instantly.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <button onClick="{{ selectMobile }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;background:#fff;border:none;cursor:pointer;font-size:14px;font-weight:700;color:#16204D">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16204D" stroke-width="2.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                Mobile
+              </button>
+              <button onClick="{{ selectBB }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:12px;background:linear-gradient(135deg,#D91456,#FF2070);border:none;cursor:pointer;font-size:14px;font-weight:700;color:#fff">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                Broadband
+              </button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- CAMPAIGN BANNER [AD SLOT — shared] -->
+        <sc-if value="{{ campaignVisible }}" hint-placeholder-val="{{ true }}">
+          <div style="{{ campWrap }}">
+            <div style="position:absolute;top:12px;right:16px;z-index:2;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:2px 10px">
+              <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.85);letter-spacing:0.07em">SPONSORED</span>
+            </div>
+            <button onClick="{{ closeCampaign }}" style="position:absolute;top:10px;left:14px;z-index:2;width:22px;height:22px;border-radius:11px;border:none;background:rgba(255,255,255,0.2);cursor:pointer;color:#fff;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center">×</button>
+            <div style="{{ campInner }}">
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                  <span style="background:#FFD700;color:#7A3B00;border-radius:6px;padding:3px 10px;font-size:10px;font-weight:800">DIWALI SPECIAL · LIMITED TIME</span>
+                </div>
+                <p style="{{ campHeadStyle }}">2× brand coupons on every qualifying bill payment this week!</p>
+              </div>
+              <div style="display:flex;gap:6px;flex-shrink:0">
+                <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:8px 12px;text-align:center;min-width:44px">
+                  <div style="{{ campDigitStyle }}">{{ cdD }}</div>
+                  <div style="font-size:9px;color:rgba(255,255,255,0.6);letter-spacing:0.05em;margin-top:2px">DAYS</div>
+                </div>
+                <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:8px 12px;text-align:center;min-width:44px">
+                  <div style="{{ campDigitStyle }}">{{ cdH }}</div>
+                  <div style="font-size:9px;color:rgba(255,255,255,0.6);letter-spacing:0.05em;margin-top:2px">HRS</div>
+                </div>
+                <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:8px 12px;text-align:center;min-width:44px">
+                  <div style="{{ campDigitStyle }}">{{ cdM }}</div>
+                  <div style="font-size:9px;color:rgba(255,255,255,0.6);letter-spacing:0.05em;margin-top:2px">MIN</div>
+                </div>
+                <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:8px 12px;text-align:center;min-width:44px">
+                  <div style="{{ campDigitStyle }}">{{ cdS }}</div>
+                  <div style="font-size:9px;color:rgba(255,255,255,0.6);letter-spacing:0.05em;margin-top:2px">SEC</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- HOW IT WORKS -->
+        <div style="{{ sectionWrap }}">
+          <h2 style="{{ sectionHeadStyle }}">How it works</h2>
+          <div style="{{ howWorksGrid }}">
+            <div style="background:#fff;border-radius:16px;padding:{{ howCardPad }};text-align:center;box-shadow:0 2px 12px rgba(22,32,77,0.07)">
+              <div style="{{ howIconWrap }}">
+                <svg width="{{ howIconSz }}" height="{{ howIconSz }}" viewBox="0 0 24 24" fill="none" stroke="#16204D" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+              </div>
+              <p style="{{ howTitleStyle }}">Pay your bill</p>
+              <p style="{{ howSubStyle }}">Postpaid mobile or broadband — all major operators supported</p>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:{{ howCardPad }};text-align:center;box-shadow:0 2px 12px rgba(22,32,77,0.07)">
+              <div style="{{ howIconWrap2 }}">
+                <svg width="{{ howIconSz }}" height="{{ howIconSz }}" viewBox="0 0 24 24" fill="none" stroke="#D91456" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.87L12 17.77l-6.18 3.24L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+              </div>
+              <p style="{{ howTitleStyle }}">Save the fee</p>
+              <p style="{{ howSubStyle }}">Bills ₹299 and above pay zero convenience fee — automatically applied</p>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:{{ howCardPad }};text-align:center;box-shadow:0 2px 12px rgba(22,32,77,0.07)">
+              <div style="{{ howIconWrap3 }}">
+                <svg width="{{ howIconSz }}" height="{{ howIconSz }}" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+              </div>
+              <p style="{{ howTitleStyle }}">Earn a reward</p>
+              <p style="{{ howSubStyle }}">Get exclusive brand coupons from our 6 D2C partner brands instantly</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PARTNER CAROUSEL [AD SLOT] -->
+        <div style="{{ sectionWrap }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <h2 style="{{ sectionHeadStyle }}">Partner Offers</h2>
+            <span style="font-size:10px;font-weight:700;letter-spacing:0.07em;color:#D91456;border:1.5px solid #D91456;border-radius:10px;padding:2px 10px">PARTNER OFFER</span>
+          </div>
+          <div style="{{ cpCardStyle }}" onClick="{{ goOffers }}">
+            <div style="{{ cpInnerStyle }}">
+              <div style="{{ cpInitStyle }}">{{ cpInitial }}</div>
+              <div style="flex:1">
+                <p style="{{ cpNameStyle }}">{{ cpName }}</p>
+                <p style="font-size:13px;color:#5A6A8A">{{ cpCat }}</p>
+                <p style="font-size:13px;color:#5A6A8A;margin-top:6px;line-height:1.5">{{ cpDesc }}</p>
+              </div>
+              <div style="text-align:right;flex-shrink:0">
+                <div style="{{ cpCouponStyle }}">{{ cpCoupon }}</div>
+                <p style="font-size:11px;color:#94A3B8;margin-top:8px">Use code</p>
+                <p style="font-size:14px;font-weight:800;color:#16204D;font-family:monospace;letter-spacing:0.06em">{{ cpCode }}</p>
+                <span style="font-size:12px;color:#D91456;font-weight:600;margin-top:8px;display:block">View all offers →</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;justify-content:center;margin-top:12px">
+            <sc-for list="{{ cdDots }}" as="dot" hint-placeholder-count="6">
+              <div style="{{ dot.style }}"></div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- BRAND PARTNERS PREVIEW -->
+        <div style="{{ sectionWrap }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <h2 style="{{ sectionHeadStyle }}">Brand Partners</h2>
+            <button onClick="{{ goOffers }}" style="font-size:14px;font-weight:600;color:#D91456;background:none;border:none;cursor:pointer">View all offers →</button>
+          </div>
+          <div style="{{ partnerPreviewGrid }}">
+            <sc-for list="{{ previewPartners }}" as="p" hint-placeholder-count="6">
+              <div style="{{ p.tileStyle }}" onClick="{{ p.onClick }}">
+                <div style="{{ p.barStyle }}">
+                  <div style="{{ p.initStyle }}">{{ p.initial }}</div>
+                  <div>
+                    <p style="font-size:14px;font-weight:800;color:#fff">{{ p.name }}</p>
+                    <p style="font-size:11px;color:rgba(255,255,255,0.75)">{{ p.cat }}</p>
+                  </div>
+                </div>
+                <div style="padding:12px 14px">
+                  <div style="{{ p.couponStyle }}">{{ p.coupon }}</div>
+                  <p style="font-size:12px;color:#5A6A8A;margin-top:6px">Min. {{ p.min }}</p>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- TRUST STRIP -->
+        <div style="{{ trustWrap }}">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:{{ trustGap }}">
+            <div style="display:flex;align-items:center;gap:14px;{{ trustItemStyle }}">
+              <div style="width:44px;height:44px;border-radius:22px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16204D" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              </div>
+              <div><p style="font-size:14px;font-weight:700;color:#16204D">RBI Licensed</p><p style="font-size:12px;color:#94A3B8;margin-top:2px">Regulated payment gateway</p></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;{{ trustItemStyle }}">
+              <div style="width:44px;height:44px;border-radius:22px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              </div>
+              <div><p style="font-size:14px;font-weight:700;color:#16204D">256-bit SSL</p><p style="font-size:12px;color:#94A3B8;margin-top:2px">End-to-end encrypted</p></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;{{ trustItemStyle }}">
+              <div style="width:44px;height:44px;border-radius:22px;background:#FFF0F5;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D91456" stroke-width="2" stroke-linecap="round"><polyline points="22 11.08 12 2.01 1.99 11.07"></polyline><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <div><p style="font-size:14px;font-weight:700;color:#16204D">PCI DSS</p><p style="font-size:12px;color:#94A3B8;margin-top:2px">Payment card compliant</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div style="{{ footerWrap }}">
+          <div style="{{ footerGrid }}">
+            <div>
+              <img src="logo-lockup.png" style="{{ footerLogoStyle }}" alt="BillPayBox">
+              <p style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;margin-top:12px;max-width:280px">Pay postpaid mobile &amp; broadband bills. Zero fee on qualifying payments. Earn brand rewards every time.</p>
+            </div>
+            <div>
+              <p style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.35);letter-spacing:0.08em;margin-bottom:14px">QUICK LINKS</p>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <span style="font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer" onClick="{{ goHome }}">Home</span>
+                <span style="font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer" onClick="{{ goPay }}">Pay a Bill</span>
+                <span style="font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer" onClick="{{ goOffers }}">Rewards &amp; Offers</span>
+                <span style="font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer" onClick="{{ goDash }}">My Account</span>
+              </div>
+            </div>
+            <div>
+              <p style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.35);letter-spacing:0.08em;margin-bottom:14px">PARTNER BRANDS</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <sc-for list="{{ allPartners }}" as="fp" hint-placeholder-count="6">
+                  <div style="display:flex;align-items:center;gap:7px;cursor:pointer" onClick="{{ fp.onClick }}">
+                    <div style="{{ fp.footerInitStyle }}">{{ fp.initial }}</div>
+                    <span style="font-size:12px;color:rgba(255,255,255,0.55)">{{ fp.name }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <p style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.35);letter-spacing:0.08em;margin-bottom:14px">LEGAL &amp; COMPLIANCE</p>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <span style="font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer">Privacy Policy</span>
+                <span style="font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer">Terms of Use</span>
+                <span style="font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer">DPDP Data Notice</span>
+                <span style="font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer">Grievance Officer</span>
+              </div>
+            </div>
+          </div>
+          <div style="{{ footerDivider }}"></div>
+          <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center">© 2026 BillPayBox Technologies Pvt. Ltd. All rights reserved. | Payments processed by RBI-licensed gateway.</p>
+        </div>
+
+      </div>
+    </sc-if>
+
+    <!-- ═══ PAY TYPE ═══ -->
+    <sc-if value="{{ isPayType }}" hint-placeholder-val="{{ false }}">
+      <div style="{{ payCardWrap }}">
+        <p style="font-size:14px;color:#5A6A8A;margin-bottom:24px;line-height:1.6">Select the type of postpaid bill to pay.</p>
+        <div onClick="{{ selectMobile }}" style="background:#fff;border-radius:18px;border:2px solid #E8EDF5;padding:22px;margin-bottom:14px;cursor:pointer">
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:52px;height:52px;border-radius:16px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16204D" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+            </div>
+            <div style="flex:1">
+              <p style="font-size:17px;font-weight:800;color:#16204D">Postpaid Mobile</p>
+              <p style="font-size:13px;color:#5A6A8A;margin-top:2px">Airtel · Jio · Vi · BSNL · MTNL</p>
+            </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid #F1F5F9;display:flex;gap:20px">
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:6px;height:6px;border-radius:3px;background:#059669"></div><span style="font-size:12px;color:#5A6A8A">₹0 fee on bills ≥ ₹299</span></div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:6px;height:6px;border-radius:3px;background:#D91456"></div><span style="font-size:12px;color:#5A6A8A">Earn brand reward</span></div>
+          </div>
+        </div>
+        <div onClick="{{ selectBB }}" style="background:#fff;border-radius:18px;border:2px solid #E8EDF5;padding:22px;cursor:pointer">
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:52px;height:52px;border-radius:16px;background:#FFF0F5;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D91456" stroke-width="2" stroke-linecap="round"><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+            </div>
+            <div style="flex:1">
+              <p style="font-size:17px;font-weight:800;color:#16204D">Broadband Postpaid</p>
+              <p style="font-size:13px;color:#5A6A8A;margin-top:2px">Jio Fiber · Airtel · ACT · BSNL</p>
+            </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid #F1F5F9;display:flex;gap:20px">
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:6px;height:6px;border-radius:3px;background:#059669"></div><span style="font-size:12px;color:#5A6A8A">₹0 fee on bills ≥ ₹299</span></div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:6px;height:6px;border-radius:3px;background:#D91456"></div><span style="font-size:12px;color:#5A6A8A">Earn brand reward</span></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ═══ PAY FORM ═══ -->
+    <sc-if value="{{ isPayForm }}" hint-placeholder-val="{{ false }}">
+      <div style="{{ payCardWrap }}">
+        <div style="display:flex;background:#F1F5F9;border-radius:12px;padding:4px;margin-bottom:20px">
+          <button onClick="{{ selectMobile }}" style="{{ toggleMobileStyle }}">Mobile</button>
+          <button onClick="{{ selectBB }}" style="{{ toggleBBStyle }}">Broadband</button>
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="font-size:13px;font-weight:600;color:#16204D;display:block;margin-bottom:6px">{{ phoneLabel }}</label>
+          <input type="tel" placeholder="{{ phonePH }}" onChange="{{ onMobileChange }}" value="{{ mobile }}" style="width:100%;padding:14px 16px;border-radius:12px;border:2px solid #E2E8F0;font-size:16px;color:#16204D;background:#fff">
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="font-size:13px;font-weight:600;color:#16204D;display:block;margin-bottom:6px">Bill Amount (₹)</label>
+          <div style="position:relative">
+            <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:18px;color:#94A3B8;font-weight:600;pointer-events:none">₹</span>
+            <input type="number" placeholder="0" onChange="{{ onAmtChange }}" value="{{ billAmount }}" style="width:100%;padding:14px 16px;padding-left:34px;border-radius:12px;border:2px solid #E2E8F0;font-size:20px;font-weight:700;color:#16204D;background:#fff">
+          </div>
+          <p style="{{ feeNoteStyle }}">{{ feeNote }}</p>
+        </div>
+        <div style="margin-bottom:24px">
+          <label style="font-size:13px;font-weight:600;color:#16204D;display:block;margin-bottom:10px">Select Operator</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ opPills }}" as="op" hint-placeholder-count="5">
+              <button onClick="{{ op.click }}" style="{{ op.style }}">{{ op.name }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <button onClick="{{ submitForm }}" style="{{ proceedStyle }}">Proceed to Pay →</button>
+      </div>
+    </sc-if>
+
+    <!-- ═══ PAY CONFIRM ═══ -->
+    <sc-if value="{{ isPayConfirm }}" hint-placeholder-val="{{ false }}">
+      <div style="{{ payCardWrap }}">
+        <div style="background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 16px rgba(22,32,77,0.1);margin-bottom:16px">
+          <div style="background:#16204D;padding:18px 22px;display:flex;align-items:center;gap:14px">
+            <div style="width:40px;height:40px;border-radius:20px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+            </div>
+            <div style="flex:1">
+              <p style="font-size:12px;color:rgba(255,255,255,0.6)">{{ billTypeLabel }}</p>
+              <p style="font-size:17px;font-weight:800;color:#fff">{{ mobileDisplay }}</p>
+            </div>
+            <div style="text-align:right">
+              <p style="font-size:11px;color:rgba(255,255,255,0.55)">Operator</p>
+              <p style="font-size:15px;font-weight:700;color:#fff">{{ operatorDisplay }}</p>
+            </div>
+          </div>
+          <div style="padding:22px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:14px;color:#5A6A8A">Bill Amount</span><span style="font-size:14px;font-weight:700;color:#16204D">{{ amtDisplay }}</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:14px;color:#5A6A8A">Convenience Fee</span><span style="{{ feeValStyle }}">{{ fee }}</span></div>
+            <p style="{{ feeNoteStyle }}">{{ feeNote }}</p>
+            <div style="border-top:2px solid #F1F5F9;padding-top:16px;margin-top:16px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:16px;font-weight:700;color:#16204D">Total Payable</span>
+              <span style="font-size:26px;font-weight:900;color:#16204D">{{ totalAmt }}</span>
+            </div>
+          </div>
+        </div>
+        <div style="background:linear-gradient(135deg,#FFF0F5,#F5F0FF);border:1.5px solid rgba(217,20,86,0.3);border-radius:14px;padding:16px 18px;margin-bottom:22px;display:flex;align-items:center;gap:14px">
+          <div style="width:40px;height:40px;border-radius:20px;background:#D91456;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+          </div>
+          <div>
+            <p style="font-size:14px;font-weight:700;color:#16204D">You'll earn a brand reward!</p>
+            <p style="font-size:13px;color:#5A6A8A;margin-top:2px">Coupon from one of our 6 partner brands — revealed after payment.</p>
+          </div>
+        </div>
+        <button onClick="{{ confirmPay }}" style="width:100%;padding:17px;background:linear-gradient(135deg,#D91456,#FF2070);color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:800;cursor:pointer">Confirm &amp; Pay {{ totalAmt }}</button>
+        <p style="font-size:11px;color:#94A3B8;text-align:center;margin-top:14px">Secured · RBI-licensed gateway · 256-bit SSL encryption</p>
+      </div>
+    </sc-if>
+
+    <!-- ═══ PAY PROCESSING ═══ -->
+    <sc-if value="{{ isPayProcessing }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;padding:40px 24px;animation:slideUp 0.3s ease">
+        <div style="position:relative;margin-bottom:32px">
+          <div style="width:88px;height:88px;border-radius:44px;border:4px solid #EEF2FF;border-top-color:#16204D;animation:spin 0.9s linear infinite"></div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16204D" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+          </div>
+        </div>
+        <h2 style="font-size:22px;font-weight:800;color:#16204D;margin-bottom:8px">Processing Payment</h2>
+        <p style="font-size:14px;color:#5A6A8A;margin-bottom:36px;text-align:center">Please keep this screen open. This will only take a moment.</p>
+        <div style="width:100%;max-width:420px;background:#fff;border-radius:18px;padding:24px;box-shadow:0 2px 16px rgba(22,32,77,0.08)">
+          <sc-for list="{{ procSteps }}" as="step" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:14px;padding:10px 0">
+              <div style="{{ step.dotStyle }}"></div>
+              <span style="{{ step.labelStyle }}">{{ step.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ═══ REWARD REVEAL ═══ -->
+    <sc-if value="{{ isPayReward }}" hint-placeholder-val="{{ false }}">
+      <div style="min-height:80vh;background:linear-gradient(180deg,#F0FDF4 0%,#F5F7FB 40%);padding:48px 20px 80px;animation:slideUp 0.4s ease;position:relative;overflow:hidden">
+        <div style="position:fixed;top:0;left:0;right:0;height:200px;pointer-events:none;overflow:hidden">
+          <div style="position:absolute;top:0;left:18%;width:10px;height:10px;background:#D91456;border-radius:2px;animation:fall 2s ease infinite 0s;opacity:0"></div>
+          <div style="position:absolute;top:0;left:38%;width:8px;height:8px;background:#FFD700;border-radius:50%;animation:fall 2.3s ease infinite 0.4s;opacity:0"></div>
+          <div style="position:absolute;top:0;left:58%;width:10px;height:10px;background:#16204D;border-radius:2px;animation:fall 1.9s ease infinite 0.8s;opacity:0"></div>
+          <div style="position:absolute;top:0;left:75%;width:8px;height:8px;background:#059669;border-radius:50%;animation:fall 2.5s ease infinite 1.1s;opacity:0"></div>
+          <div style="position:absolute;top:0;left:28%;width:6px;height:6px;background:#7C3AED;border-radius:2px;animation:fall 2.1s ease infinite 1.4s;opacity:0"></div>
+          <div style="position:absolute;top:0;left:82%;width:8px;height:8px;background:#D97706;border-radius:50%;animation:fall 2.4s ease infinite 1.7s;opacity:0"></div>
+        </div>
+        <div style="max-width:560px;margin:0 auto">
+          <div style="text-align:center;margin-bottom:28px">
+            <div style="width:80px;height:80px;border-radius:40px;background:#059669;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;animation:popIn 0.6s ease both;box-shadow:0 8px 32px rgba(5,150,105,0.3)">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h1 style="font-size:28px;font-weight:900;color:#16204D">Payment Successful!</h1>
+            <p style="font-size:15px;color:#5A6A8A;margin-top:8px">Your bill is paid. Here's your brand reward.</p>
+          </div>
+          <div style="{{ rpCardStyle }}">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="{{ rpInitStyle }}">{{ rpInitial }}</div>
+                <div><p style="font-size:18px;font-weight:800;color:#16204D">{{ rpName }}</p><p style="font-size:13px;color:#5A6A8A">{{ rpCat }}</p></div>
+              </div>
+              <span style="font-size:10px;font-weight:700;letter-spacing:0.07em;color:#D91456;border:1.5px solid #D91456;border-radius:10px;padding:3px 10px;background:#fff;white-space:nowrap">PARTNER OFFER</span>
+            </div>
+            <p style="font-size:13px;color:#5A6A8A;line-height:1.6;margin-bottom:20px">{{ rpDesc }}</p>
+            <div style="text-align:center;margin-bottom:16px">
+              <p style="font-size:10px;font-weight:700;color:#5A6A8A;letter-spacing:0.06em;margin-bottom:8px">YOUR EXCLUSIVE REWARD</p>
+              <div style="{{ rpCouponStyle }}">{{ rpCoupon }}</div>
+            </div>
+            <div onClick="{{ copyCode }}" style="{{ rpCodeBoxStyle }}">
+              <span style="font-size:15px;font-weight:800;color:#16204D;font-family:monospace;letter-spacing:0.08em">{{ rpCode }}</span>
+              <span style="{{ rpCopyStyle }}">{{ copiedText }}</span>
+            </div>
+            <p style="font-size:12px;color:#94A3B8;text-align:center;margin:12px 0 16px">Min. order {{ rpMin }} · Valid till {{ rpValidity }}</p>
+            <button onClick="{{ shopReward }}" style="{{ rpShopStyle }}">Shop at {{ rpName }} →</button>
+          </div>
+          <button onClick="{{ goHomeFromReward }}" style="margin-top:14px;width:100%;padding:14px;background:transparent;border:2px solid #E2E8F0;border-radius:12px;font-size:14px;font-weight:700;color:#5A6A8A;cursor:pointer">Back to Home</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ═══ OFFERS ═══ -->
+    <sc-if value="{{ isOffers }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slideUp 0.3s ease">
+        <!-- Campaign banner -->
+        <sc-if value="{{ offersCampVisible }}" hint-placeholder-val="{{ true }}">
+          <div style="{{ campWrap }}">
+            <div style="position:absolute;top:12px;right:16px;z-index:2;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:2px 10px">
+              <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.85);letter-spacing:0.07em">SPONSORED</span>
+            </div>
+            <button onClick="{{ closeOffersCamp }}" style="position:absolute;top:10px;left:14px;z-index:2;width:22px;height:22px;border-radius:11px;border:none;background:rgba(255,255,255,0.2);cursor:pointer;color:#fff;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center">×</button>
+            <div style="{{ campInner }}">
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                  <span style="background:#FFD700;color:#7A3B00;border-radius:6px;padding:3px 10px;font-size:10px;font-weight:800">DIWALI SPECIAL</span>
+                </div>
+                <p style="{{ campHeadStyle }}">Earn 2× coupons on every qualifying payment this week!</p>
+              </div>
+              <div style="display:flex;gap:6px;flex-shrink:0">
+                <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:8px 12px;text-align:center;min-width:44px"><div style="{{ campDigitStyle }}">{{ cdD }}</div><div style="font-size:9px;color:rgba(255,255,255,0.6)">D</div></div>
+                <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:8px 12px;text-align:center;min-width:44px"><div style="{{ campDigitStyle }}">{{ cdH }}</div><div style="font-size:9px;color:rgba(255,255,255,0.6)">H</div></div>
+                <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:8px 12px;text-align:center;min-width:44px"><div style="{{ campDigitStyle }}">{{ cdM }}</div><div style="font-size:9px;color:rgba(255,255,255,0.6)">M</div></div>
+                <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:8px 12px;text-align:center;min-width:44px"><div style="{{ campDigitStyle }}">{{ cdS }}</div><div style="font-size:9px;color:rgba(255,255,255,0.6)">S</div></div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <div style="{{ sectionWrap }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <h2 style="{{ sectionHeadStyle }}">All Partner Offers</h2>
+            <span style="font-size:10px;font-weight:700;letter-spacing:0.07em;color:#D91456;border:1.5px solid #D91456;border-radius:10px;padding:2px 10px">PARTNER OFFER</span>
+          </div>
+          <!-- Featured partner -->
+          <div style="{{ featuredTileStyle }}" onClick="{{ featuredPartner.onClick }}">
+            <div style="position:absolute;top:14px;right:14px;z-index:1"><span style="{{ featuredBadgeStyle }}">FEATURED PARTNER</span></div>
+            <div style="{{ featuredBarStyle }}">
+              <div style="{{ featuredInitStyle }}">{{ featuredPartner.initial }}</div>
+              <div>
+                <p style="{{ featuredNameStyle }}">{{ featuredPartner.name }}</p>
+                <p style="font-size:13px;color:rgba(255,255,255,0.75)">{{ featuredPartner.cat }}</p>
+              </div>
+            </div>
+            <div style="{{ featuredBodyStyle }}">
+              <p style="font-size:14px;color:#5A6A8A;line-height:1.6;margin-bottom:16px">{{ featuredPartner.desc }}</p>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div>
+                  <p style="font-size:10px;color:#94A3B8;margin-bottom:6px;letter-spacing:0.05em">EXCLUSIVE COUPON</p>
+                  <div style="{{ featuredCouponStyle }}">{{ featuredPartner.coupon }}</div>
+                </div>
+                <div style="text-align:right">
+                  <p style="font-size:10px;color:#94A3B8;margin-bottom:4px">Use code</p>
+                  <p style="font-size:14px;font-weight:800;color:#16204D;font-family:monospace">{{ featuredPartner.code }}</p>
+                </div>
+              </div>
+              <p style="font-size:12px;color:#94A3B8;margin-top:12px">Min. order {{ featuredPartner.min }} · Valid till {{ featuredPartner.validity }}</p>
+            </div>
+          </div>
+          <!-- Grid of remaining 5 -->
+          <div style="{{ offersGrid }}">
+            <sc-for list="{{ gridPartners }}" as="p" hint-placeholder-count="5">
+              <div style="{{ p.tileStyle }}" onClick="{{ p.onClick }}">
+                <div style="{{ p.barStyle }}">
+                  <div style="{{ p.initStyle }}">{{ p.initial }}</div>
+                  <div><p style="font-size:13px;font-weight:800;color:#fff">{{ p.name }}</p><p style="font-size:10px;color:rgba(255,255,255,0.75)">{{ p.cat }}</p></div>
+                </div>
+                <div style="padding:12px 14px">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+                    <div style="{{ p.couponStyle }}">{{ p.coupon }}</div>
+                    <span style="font-size:9px;font-weight:700;color:#D91456;border:1px solid #D91456;border-radius:7px;padding:1px 6px;background:#fff">PARTNER</span>
+                  </div>
+                  <p style="font-size:12px;color:#5A6A8A">Min. {{ p.min }}</p>
+                  <p style="font-size:11px;color:#94A3B8;font-family:monospace;margin-top:3px">{{ p.code }}</p>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <p style="font-size:12px;color:#94A3B8;text-align:center;padding:24px 0;line-height:1.6">Coupons earned after qualifying bill payment (≥ ₹299). Partner brands are independent service providers.</p>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ═══ PARTNER DETAIL ═══ -->
+    <sc-if value="{{ isPartnerDetail }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slideUp 0.3s ease">
+        <div style="{{ apHeaderStyle }}">
+          <div style="{{ apHeaderInner }}">
+            <div style="{{ apInitBigStyle }}">{{ apInitial }}</div>
+            <div>
+              <h1 style="{{ apNameStyle }}">{{ apName }}</h1>
+              <p style="font-size:14px;color:rgba(255,255,255,0.7);margin-top:4px">{{ apCat }}</p>
+              <div style="display:inline-block;background:rgba(255,255,255,0.18);border-radius:10px;padding:3px 14px;margin-top:10px">
+                <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.85);letter-spacing:0.07em">PARTNER OFFER</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="{{ detailBodyStyle }}">
+          <div style="{{ detailLeftStyle }}">
+            <p style="font-size:15px;color:#5A6A8A;line-height:1.7;margin-bottom:20px">{{ apDesc }}</p>
+            <div style="background:#EEF2FF;border-radius:14px;padding:18px;display:flex;align-items:center;gap:14px">
+              <div style="flex:1">
+                <p style="font-size:14px;font-weight:700;color:#16204D">Haven't earned this yet?</p>
+                <p style="font-size:13px;color:#5A6A8A;margin-top:3px">Pay a bill ≥ ₹299 to unlock it instantly.</p>
+              </div>
+              <button onClick="{{ goPay }}" style="padding:12px 20px;background:#16204D;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap">Pay Bill →</button>
+            </div>
+          </div>
+          <div style="{{ detailRightStyle }}">
+            <div style="background:#fff;border-radius:20px;padding:24px;box-shadow:0 2px 16px rgba(22,32,77,0.09)">
+              <p style="font-size:11px;font-weight:700;color:#94A3B8;letter-spacing:0.07em;margin-bottom:14px">YOUR BILLPAYBOX REWARD</p>
+              <div style="text-align:center;margin-bottom:18px">
+                <div style="{{ apBigCouponStyle }}">{{ apCoupon }}</div>
+              </div>
+              <div onClick="{{ copyApCode }}" style="{{ apCodeBoxStyle }}">
+                <div>
+                  <p style="font-size:11px;color:#94A3B8;margin-bottom:2px">Coupon Code</p>
+                  <p style="font-size:16px;font-weight:800;color:#16204D;font-family:monospace;letter-spacing:0.08em">{{ apCode }}</p>
+                </div>
+                <span style="{{ apCopyStyle }}">{{ copiedText }}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;margin-bottom:20px">
+                <div style="background:#F8FAFC;border-radius:10px;padding:12px">
+                  <p style="font-size:11px;color:#94A3B8;margin-bottom:3px">Min. Order</p>
+                  <p style="font-size:15px;font-weight:700;color:#16204D">{{ apMin }}</p>
+                </div>
+                <div style="background:#F8FAFC;border-radius:10px;padding:12px">
+                  <p style="font-size:11px;color:#94A3B8;margin-bottom:3px">Valid Until</p>
+                  <p style="font-size:15px;font-weight:700;color:#16204D">{{ apValidity }}</p>
+                </div>
+              </div>
+              <button onClick="{{ shopApPartner }}" style="{{ apShopStyle }}">Shop &amp; Redeem at {{ apName }} →</button>
+              <p style="font-size:11px;color:#94A3B8;text-align:center;margin-top:12px;line-height:1.6">BillPayBox is not responsible for partner terms &amp; conditions.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slideUp 0.3s ease">
+        <div style="background:linear-gradient(135deg,#16204D,#1C2B6E);padding:{{ dashHeroPad }}">
+          <div style="{{ dashHeroInner }}">
+            <div>
+              <p style="font-size:14px;color:rgba(255,255,255,0.55);margin-bottom:4px">Welcome back</p>
+              <h1 style="{{ dashNameStyle }}">Rahul Sharma</h1>
+            </div>
+            <div style="{{ primeBadgeStyle }}">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <div style="width:28px;height:28px;border-radius:14px;background:linear-gradient(135deg,#FFD700,#FFA500);display:flex;align-items:center;justify-content:center">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.87L12 17.77l-6.18 3.24L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                </div>
+                <span style="font-size:15px;font-weight:800;color:#fff">Prime Status</span>
+                <span style="background:linear-gradient(135deg,#FFD700,#FFA500);color:#7A3B00;border-radius:8px;padding:3px 10px;font-size:11px;font-weight:800;margin-left:auto">ACTIVE</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                <span style="font-size:12px;color:rgba(255,255,255,0.6)">4 of 6 qualifying payments this month</span>
+                <span style="font-size:12px;font-weight:700;color:#FFD700">67%</span>
+              </div>
+              <div style="background:rgba(255,255,255,0.15);border-radius:4px;height:6px;overflow:hidden">
+                <div style="width:67%;height:100%;background:linear-gradient(90deg,#FFD700,#FFA500);border-radius:4px"></div>
+              </div>
+              <p style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:6px">2 more qualifying payments to maintain Prime next month</p>
+            </div>
+          </div>
+        </div>
+        <div style="{{ dashBodyStyle }}">
+          <!-- LEFT COL -->
+          <div style="{{ dashLeftStyle }}">
+            <!-- Persistent ad slot -->
+            <div style="background:linear-gradient(135deg,#FCE4EC,#F3E5F5);border:1.5px solid rgba(194,24,91,0.2);border-radius:14px;padding:16px;position:relative;margin-bottom:20px">
+              <div style="position:absolute;top:8px;right:10px;background:rgba(217,20,86,0.1);border:1px solid rgba(217,20,86,0.25);border-radius:7px;padding:1px 8px">
+                <span style="font-size:9px;font-weight:700;color:#D91456;letter-spacing:0.06em">PARTNER OFFER</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding-right:80px">
+                <div style="width:44px;height:44px;border-radius:22px;background:#C2185B;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0">GL</div>
+                <div>
+                  <p style="font-size:14px;font-weight:700;color:#16204D">Your GlowLab reward is ready!</p>
+                  <p style="font-size:12px;color:#5A6A8A;margin-top:2px">Code GLOWBPB20 · 20% OFF · Expires 31 Aug</p>
+                </div>
+              </div>
+              <button onClick="{{ goOffers }}" style="position:absolute;right:14px;bottom:16px;font-size:13px;font-weight:700;color:#C2185B;background:none;border:none;cursor:pointer">Redeem →</button>
+            </div>
+            <!-- Active coupons -->
+            <h2 style="font-size:16px;font-weight:800;color:#16204D;margin-bottom:12px">Active Coupons</h2>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+              <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(22,32,77,0.06);display:flex">
+                <div style="width:5px;background:#C2185B;flex-shrink:0"></div>
+                <div style="flex:1;padding:14px 16px;display:flex;align-items:center;gap:12px">
+                  <div style="width:40px;height:40px;border-radius:20px;background:#C2185B;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0">GL</div>
+                  <div style="flex:1"><p style="font-size:14px;font-weight:700;color:#16204D">GlowLab · 20% OFF</p><p style="font-size:12px;color:#5A6A8A;font-family:monospace">GLOWBPB20</p></div>
+                  <div style="text-align:right"><p style="font-size:10px;color:#94A3B8">Expires</p><p style="font-size:13px;font-weight:600;color:#16204D">31 Aug</p></div>
+                </div>
+              </div>
+              <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(22,32,77,0.06);display:flex">
+                <div style="width:5px;background:#2E7D32;flex-shrink:0"></div>
+                <div style="flex:1;padding:14px 16px;display:flex;align-items:center;gap:12px">
+                  <div style="width:40px;height:40px;border-radius:20px;background:#2E7D32;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0">NP</div>
+                  <div style="flex:1"><p style="font-size:14px;font-weight:700;color:#16204D">NutriPeak · 15% OFF</p><p style="font-size:12px;color:#5A6A8A;font-family:monospace">NUTRIBPB15</p></div>
+                  <div style="text-align:right"><p style="font-size:10px;color:#94A3B8">Expires</p><p style="font-size:13px;font-weight:600;color:#16204D">31 Aug</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- RIGHT COL -->
+          <div style="{{ dashRightStyle }}">
+            <h2 style="font-size:16px;font-weight:800;color:#16204D;margin-bottom:12px">Recent Payments</h2>
+            <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(22,32,77,0.06)">
+              <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F1F5F9">
+                <div style="width:38px;height:38px;border-radius:19px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#16204D" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                </div>
+                <div style="flex:1"><p style="font-size:13px;font-weight:600;color:#16204D">Airtel Postpaid</p><p style="font-size:11px;color:#94A3B8">5 Jul 2026 · 9876543210</p></div>
+                <div style="text-align:right"><p style="font-size:14px;font-weight:800;color:#16204D">₹799</p><p style="font-size:10px;font-weight:600;color:#059669">Zero fee</p></div>
+              </div>
+              <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F1F5F9">
+                <div style="width:38px;height:38px;border-radius:19px;background:#FFF0F5;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#D91456" stroke-width="2" stroke-linecap="round"><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                </div>
+                <div style="flex:1"><p style="font-size:13px;font-weight:600;color:#16204D">Jio Fiber</p><p style="font-size:11px;color:#94A3B8">28 Jun 2026</p></div>
+                <div style="text-align:right"><p style="font-size:14px;font-weight:800;color:#16204D">₹999</p><p style="font-size:10px;font-weight:600;color:#059669">Zero fee</p></div>
+              </div>
+              <div style="padding:14px 16px;display:flex;align-items:center;gap:12px">
+                <div style="width:38px;height:38px;border-radius:19px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#16204D" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                </div>
+                <div style="flex:1"><p style="font-size:13px;font-weight:600;color:#16204D">Vi Postpaid</p><p style="font-size:11px;color:#94A3B8">15 Jun 2026</p></div>
+                <div style="text-align:right"><p style="font-size:14px;font-weight:800;color:#16204D">₹249</p><p style="font-size:10px;font-weight:600;color:#D97706">₹5.90 fee</p></div>
+              </div>
+            </div>
+            <button onClick="{{ goPay }}" style="width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#D91456,#FF2070);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer">Pay Another Bill →</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+  <!-- END MAIN CONTENT -->
+
+  <!-- MOBILE BOTTOM NAV -->
+  <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+    <nav style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E8EDF5;display:flex;align-items:stretch;z-index:200">
+      <button onClick="{{ goHome }}" style="{{ navHomeStyle }}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span style="font-size:11px">Home</span>
+        <div style="{{ navHomeDot }}"></div>
+      </button>
+      <button onClick="{{ goPay }}" style="{{ navPayStyle }}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+        <span style="font-size:11px">Pay Bill</span>
+        <div style="{{ navPayDot }}"></div>
+      </button>
+      <button onClick="{{ goOffers }}" style="{{ navOffersStyle }}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+        <span style="font-size:11px">Rewards</span>
+        <div style="{{ navOffersDot }}"></div>
+      </button>
+      <button onClick="{{ goDash }}" style="{{ navDashStyle }}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span style="font-size:11px">Account</span>
+        <div style="{{ navDashDot }}"></div>
+      </button>
+    </nav>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: {&quot;width&quot;: 1280, &quot;height&quot;: 900}
+}">
+class Component extends DCLogic {
+  state = {
+    screen: 'home',
+    prevScreen: null,
+    billType: 'mobile',
+    operator: '',
+    mobile: '',
+    billAmount: '',
+    carouselIdx: 0,
+    countdown: { d: 4, h: 11, m: 23, s: 45 },
+    campaignVisible: true,
+    offersCampVisible: true,
+    activePartner: null,
+    procStep: 0,
+    rewardPartner: null,
+    copied: false,
+    isMobile: typeof window !== 'undefined' ? window.innerWidth < 900 : true,
+  };
+
+  P = [
+    { id: 'tropico', name: 'Tropico Nuts', cat: 'Nuts & Snacks', accent: '#C2185B', bg: '#FCE4EC', lbg: '#FFF5F9', coupon: '20% OFF', code: 'TROPIBPB20', min: '₹499', validity: '31 Aug 2026', desc: 'Premium cashews & nuts in 24 bold flavours — roasted, not fried. Clean-label indulgence for the modern Indian snacker.', url: 'https://tropiconuts.vercel.app/' },
+    { id: 'cabana', name: 'Organic Cabana', cat: 'Organic Staples', accent: '#2E7D32', bg: '#E8F5E9', lbg: '#F4FDF4', coupon: '15% OFF', code: 'CABANABPB15', min: '₹699', validity: '31 Aug 2026', desc: '100% pure organic grains, flours & dals. USDA & Jaivik Bharat certified, with 9+ years of farm-to-kitchen trust.', url: 'https://organiccabana.growthoriginator.com/' },
+    { id: 'medhavat', name: 'Medhavat', cat: 'Flours & Mixes', accent: '#E65100', bg: '#FFF3E0', lbg: '#FFFBF5', coupon: '₹100 OFF', code: 'MEDHABPB100', min: '₹399', validity: '15 Sep 2026', desc: 'Wise flours & baking mixes for the health-conscious home cook — premium wheat, multigrain and speciality blends.', url: 'https://medhavat.growthoriginator.com/' },
+    { id: 'mijo', name: 'Healthy Mijo', cat: 'Health Foods', accent: '#1565C0', bg: '#E3F2FD', lbg: '#F0F8FF', coupon: '18% OFF', code: 'MIJOBPB18', min: '₹799', validity: '30 Sep 2026', desc: 'Foods for modern lifestyles — nutritious, convenient, and designed for urban Indians who won\u2019t compromise on taste.', url: 'https://healthymijo.growthoriginator.com/' },
+    { id: 'firo', name: 'Cafe Firo', cat: 'Ready to Cook', accent: '#6A1B9A', bg: '#F3E5F5', lbg: '#FAF5FF', coupon: '25% OFF', code: 'FIROBPB25', min: '₹349', validity: '31 Aug 2026', desc: 'Easy to cook, delicious to share. Restaurant-quality meals brought home with minimal effort, maximum flavour.', url: 'https://cafefiro.tenskywholesale.com/CafeFiro.html' },
+    { id: 'farmpuro', name: 'Farm Puro', cat: 'Farm Fresh', accent: '#B71C1C', bg: '#FFEBEE', lbg: '#FFF5F5', coupon: '12% OFF', code: 'PUROBPB12', min: '₹599', validity: '31 Oct 2026', desc: 'India\u2019s food, pure and simple. Purity-assured produce delivered straight from Indian farms — traceable and honest.', url: 'https://farmpuro.tenskywholesale.com/' },
+  ];
+
+  MO = ['Airtel', 'Jio', 'Vi (Vodafone Idea)', 'BSNL', 'MTNL'];
+  BO = ['Jio Fiber', 'Airtel Xstream Fiber', 'ACT Fibernet', 'BSNL Broadband', 'Hathway'];
+
+  componentDidMount() {
+    this._t1 = setInterval(() => this.setState(s => ({ carouselIdx: (s.carouselIdx + 1) % 6 })), 3500);
+    this._t2 = setInterval(() => {
+      this.setState(s => {
+        let { d, h, m, s: sc } = s.countdown;
+        sc--;
+        if (sc < 0) { sc = 59; m--; }
+        if (m < 0) { m = 59; h--; }
+        if (h < 0) { h = 23; d--; }
+        if (d < 0) return { countdown: { d: 0, h: 0, m: 0, s: 0 } };
+        return { countdown: { d, h, m, s: sc } };
+      });
+    }, 1000);
+    this._resize = () => this.setState({ isMobile: window.innerWidth < 900 });
+    window.addEventListener('resize', this._resize);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._t1);
+    clearInterval(this._t2);
+    if (this._proc) clearInterval(this._proc);
+    window.removeEventListener('resize', this._resize);
+  }
+
+  go(screen) { this.setState({ screen, prevScreen: this.state.screen }); }
+  back() { this.go(this.state.prevScreen || 'home'); }
+
+  startProcessing() {
+    this.go('pay-processing');
+    let step = 0;
+    this._proc = setInterval(() => {
+      step++;
+      this.setState({ procStep: step });
+      if (step >= 4) {
+        clearInterval(this._proc);
+        const rp = this.P[Math.floor(Math.random() * 6)];
+        setTimeout(() => this.setState({ screen: 'pay-reward', rewardPartner: rp }), 500);
+      }
+    }, 850);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const N = '#16204D', CR = '#D91456';
+    const mob = s.isMobile;
+    const ops = s.billType === 'mobile' ? this.MO : this.BO;
+    const amt = parseFloat(s.billAmount) || 0;
+    const fw = amt >= 299;
+    const fee = fw ? 0 : 5.9;
+    const p2 = n => String(n).padStart(2, '0');
+    const cd = s.countdown;
+    const ci = s.carouselIdx;
+    const cp = this.P[ci];
+    const rp = s.rewardPartner;
+    const ap = s.activePartner;
+    const PAY = ['pay-type','pay-form','pay-confirm','pay-processing','pay-reward'];
+    const MAIN = ['home','offers','dashboard'];
+
+    const mkPartner = (p) => ({
+      ...p,
+      initial: p.name.slice(0, 2).toUpperCase(),
+      tileStyle: { background: p.lbg, borderRadius: 14, border: `1.5px solid ${p.accent}22`, cursor: 'pointer', overflow: 'hidden' },
+      barStyle: { background: p.accent, padding: '12px 12px', display: 'flex', alignItems: 'center', gap: 9 },
+      initStyle: { width: 34, height: 34, borderRadius: 17, background: 'rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#fff', flexShrink: 0 },
+      couponStyle: { display: 'inline-block', background: p.accent, color: '#fff', borderRadius: 6, padding: '3px 10px', fontSize: 12, fontWeight: 800 },
+      onClick: () => this.setState({ activePartner: p, prevScreen: s.screen, screen: 'partner-detail' }),
+      footerInitStyle: { width: 22, height: 22, borderRadius: 11, background: p.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, color: '#fff', flexShrink: 0 },
+    });
+
+    const SP = this.P.map(mkPartner);
+    const fp = SP[0];
+
+    // Responsive layout helpers
+    const SW = { maxWidth: 1200, margin: '0 auto', padding: mob ? '20px 16px 0' : '40px 48px 0' };
+    const dNavBase = { background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600, padding: '8px 14px', borderRadius: 24, transition: 'all 0.15s', whiteSpace: 'nowrap' };
+
+    return {
+      isHome: s.screen === 'home',
+      isPayType: s.screen === 'pay-type',
+      isPayForm: s.screen === 'pay-form',
+      isPayConfirm: s.screen === 'pay-confirm',
+      isPayProcessing: s.screen === 'pay-processing',
+      isPayReward: s.screen === 'pay-reward',
+      isOffers: s.screen === 'offers',
+      isPartnerDetail: s.screen === 'partner-detail',
+      isDashboard: s.screen === 'dashboard',
+      isMobile: mob,
+      isDesktop: !mob,
+      feePillDisplay: (typeof window !== 'undefined' && window.innerWidth < 1120) ? 'none' : 'inline-flex',
+
+      // Root + main layout
+      rootStyle: { minHeight: '100vh', background: '#F5F7FB', display: 'flex', flexDirection: 'column' },
+      mainStyle: { flex: 1, overflowX: 'hidden', paddingBottom: mob ? 72 : 0 },
+
+      // Desktop nav styles
+      dNavHome: { ...dNavBase, background: s.screen === 'home' ? '#EEF2FF' : 'none', color: s.screen === 'home' ? N : '#64748B' },
+      dNavPay: { ...dNavBase, background: PAY.includes(s.screen) ? '#FFF0F5' : 'none', color: PAY.includes(s.screen) ? CR : '#64748B' },
+      dNavOffers: { ...dNavBase, background: s.screen === 'offers' ? '#EEF2FF' : 'none', color: s.screen === 'offers' ? N : '#64748B' },
+      dNavDash: { ...dNavBase, background: s.screen === 'dashboard' ? '#EEF2FF' : 'none', color: s.screen === 'dashboard' ? N : '#64748B' },
+
+      // Mobile top bar
+      showTopBar: !['pay-processing','pay-reward'].includes(s.screen),
+      showBack: !MAIN.includes(s.screen),
+      showLogo: MAIN.includes(s.screen) || s.screen === 'partner-detail',
+      screenTitle: { 'pay-type':'Pay a Bill','pay-form':s.billType==='mobile'?'Postpaid Mobile':'Broadband Postpaid','pay-confirm':'Confirm Payment','partner-detail': ap?.name||'' }[s.screen]||'',
+
+      goHome: () => this.go('home'),
+      goPay: () => this.go('pay-type'),
+      goOffers: () => this.go('offers'),
+      goDash: () => this.go('dashboard'),
+      goBack: () => this.back(),
+      selectMobile: () => { this.setState({ billType: 'mobile', operator: '' }); this.go('pay-form'); },
+      selectBB: () => { this.setState({ billType: 'broadband', operator: '' }); this.go('pay-form'); },
+
+      mobile: s.mobile, operator: s.operator, billAmount: s.billAmount,
+      onMobileChange: e => this.setState({ mobile: e.target.value }),
+      onAmtChange: e => this.setState({ billAmount: e.target.value }),
+      phoneLabel: s.billType === 'mobile' ? 'Mobile Number' : 'Account / Mobile Number',
+      phonePH: s.billType === 'mobile' ? '10-digit mobile number' : 'Account or registered number',
+
+      toggleMobileStyle: { flex: 1, padding: mob ? '8px' : '10px', borderRadius: 8, border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', background: s.billType === 'mobile' ? N : 'transparent', color: s.billType === 'mobile' ? '#fff' : '#64748B', transition: 'all 0.2s' },
+      toggleBBStyle: { flex: 1, padding: mob ? '8px' : '10px', borderRadius: 8, border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', background: s.billType === 'broadband' ? CR : 'transparent', color: s.billType === 'broadband' ? '#fff' : '#64748B', transition: 'all 0.2s' },
+
+      opPills: ops.map(op => ({
+        name: op,
+        style: { display: 'inline-flex', alignItems: 'center', padding: '8px 14px', borderRadius: 24, border: `2px solid ${op === s.operator ? N : '#E2E8F0'}`, background: op === s.operator ? N : '#fff', color: op === s.operator ? '#fff' : '#334155', fontSize: 13, fontWeight: op === s.operator ? 700 : 500, cursor: 'pointer' },
+        click: () => this.setState({ operator: op }),
+      })),
+
+      feeNote: amt === 0 ? 'Bills ₹299+ pay zero convenience fee' : fw ? '✓ Zero fee applied — bill ≥ ₹299' : `Add ₹${(299-amt).toFixed(0)} more to unlock zero fee`,
+      feeNoteStyle: { fontSize: 12, fontWeight: 600, marginTop: 6, display: 'block', color: amt === 0 ? '#94A3B8' : fw ? '#059669' : '#D97706' },
+
+      proceedStyle: { width: '100%', padding: '16px', background: (s.mobile.length >= 10 && s.operator && s.billAmount) ? `linear-gradient(135deg,${CR},#FF2070)` : '#E2E8F0', color: (s.mobile.length >= 10 && s.operator && s.billAmount) ? '#fff' : '#94A3B8', border: 'none', borderRadius: 14, fontSize: 16, fontWeight: 800, cursor: 'pointer' },
+      submitForm: () => { if (s.mobile.length >= 10 && s.operator && s.billAmount) this.go('pay-confirm'); },
+
+      billTypeLabel: s.billType === 'mobile' ? 'Postpaid Mobile' : 'Broadband Postpaid',
+      mobileDisplay: s.mobile, operatorDisplay: s.operator,
+      amtDisplay: s.billAmount ? `₹${parseFloat(s.billAmount).toFixed(2)}` : '₹0.00',
+      fee: fw ? '₹0.00' : '₹5.90',
+      feeValStyle: { fontSize: 14, fontWeight: 700, color: fw ? '#059669' : '#334155' },
+      totalAmt: `₹${(amt + fee).toFixed(2)}`,
+      confirmPay: () => this.startProcessing(),
+
+      procSteps: ['Contacting operator','Verifying details','Processing payment','Confirming transaction'].map((label, i) => ({
+        label,
+        dotStyle: { width: 10, height: 10, borderRadius: 5, background: i < s.procStep ? '#059669' : i === s.procStep - 1 ? N : '#E2E8F0', transition: 'background 0.3s', flexShrink: 0 },
+        labelStyle: { fontSize: 14, color: i < s.procStep ? '#059669' : i === s.procStep - 1 ? N : '#94A3B8', fontWeight: i < s.procStep ? 700 : i === s.procStep - 1 ? 600 : 400, transition: 'all 0.3s' },
+      })),
+
+      // Pay card wrapper — centered on desktop
+      payCardWrap: mob
+        ? { padding: '24px 16px', animation: 'slideUp 0.3s ease' }
+        : { maxWidth: 600, margin: '48px auto', background: '#fff', borderRadius: 24, padding: '40px', boxShadow: '0 4px 32px rgba(22,32,77,0.1)', animation: 'slideUp 0.3s ease' },
+
+      // Reward
+      rpInitial: rp ? rp.name.slice(0,2).toUpperCase() : '',
+      rpName: rp?.name||'', rpCat: rp?.cat||'', rpDesc: rp?.desc||'',
+      rpCoupon: rp?.coupon||'', rpCode: rp?.code||'', rpMin: rp?.min||'', rpValidity: rp?.validity||'',
+      rpInitStyle: { width: 56, height: 56, borderRadius: 28, background: rp?.accent||CR, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 900, color: '#fff', flexShrink: 0 },
+      rpCardStyle: { background: rp?.lbg||'#fff', border: `2px solid ${rp?.accent||CR}33`, borderRadius: 20, padding: '24px' },
+      rpCouponStyle: { display: 'inline-block', background: rp?.accent||CR, color: '#fff', borderRadius: 10, padding: '10px 26px', fontSize: 26, fontWeight: 900, letterSpacing: '0.04em' },
+      rpCodeBoxStyle: { background: 'rgba(22,32,77,0.05)', border: '1.5px dashed rgba(22,32,77,0.2)', borderRadius: 10, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', marginBottom: 4 },
+      rpCopyStyle: { fontSize: 12, fontWeight: 700, color: s.copied ? '#059669' : rp?.accent||CR },
+      rpShopStyle: { width: '100%', padding: '15px', background: rp?.accent||CR, color: '#fff', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: 'pointer' },
+      copiedText: s.copied ? '✓ Copied!' : 'Tap to copy',
+      copyCode: () => { if (rp) { navigator.clipboard?.writeText(rp.code); this.setState({ copied: true }); setTimeout(() => this.setState({ copied: false }), 2000); } },
+      shopReward: () => { if (rp?.url) window.open(rp.url, '_blank'); },
+      goHomeFromReward: () => { this.setState({ procStep: 0, mobile: '', operator: '', billAmount: '' }); this.go('home'); },
+
+      // Campaign banner
+      campWrap: { position: 'relative', background: 'linear-gradient(135deg,#D91456 0%,#8B1A8F 100%)', margin: mob ? '16px 16px 0' : '24px 0 0', borderRadius: mob ? 16 : 0, overflow: 'hidden' },
+      campInner: { display: 'flex', alignItems: 'center', gap: mob ? 12 : 40, padding: mob ? '20px 16px 16px' : '28px 48px', maxWidth: mob ? 'none' : 1200, margin: '0 auto' },
+      campHeadStyle: { fontSize: mob ? 15 : 18, fontWeight: 800, color: '#fff', lineHeight: 1.4 },
+      campDigitStyle: { fontSize: mob ? 18 : 22, fontWeight: 900, color: '#fff', lineHeight: 1 },
+      campaignVisible: s.campaignVisible, closeCampaign: () => this.setState({ campaignVisible: false }),
+      offersCampVisible: s.offersCampVisible, closeOffersCamp: () => this.setState({ offersCampVisible: false }),
+      cdD: p2(cd.d), cdH: p2(cd.h), cdM: p2(cd.m), cdS: p2(cd.s),
+
+      // Section layout
+      sectionWrap: SW,
+      sectionHeadStyle: { fontSize: mob ? 16 : 22, fontWeight: 800, color: N },
+
+      // How it works
+      howWorksGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: mob ? 10 : 20, marginTop: mob ? 14 : 20 },
+      howCardPad: mob ? '14px 10px' : '28px 24px',
+      howIconSz: mob ? '20' : '32',
+      howIconWrap: { width: mob?40:60, height: mob?40:60, borderRadius: mob?20:30, background: '#EEF2FF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', marginBottom: mob?10:16 },
+      howIconWrap2: { width: mob?40:60, height: mob?40:60, borderRadius: mob?20:30, background: '#FFF0F5', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', marginBottom: mob?10:16 },
+      howIconWrap3: { width: mob?40:60, height: mob?40:60, borderRadius: mob?20:30, background: '#F0FDF4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', marginBottom: mob?10:16 },
+      howTitleStyle: { fontSize: mob?11:15, fontWeight: 700, color: N, lineHeight: 1.3 },
+      howSubStyle: { fontSize: mob?10:13, color: '#94A3B8', marginTop: mob?3:8, lineHeight: 1.5 },
+
+      // Carousel card
+      cpName: cp?.name, cpCat: cp?.cat, cpCoupon: cp?.coupon, cpCode: cp?.code, cpDesc: cp?.desc||'',
+      cpInitial: cp ? cp.name.slice(0,2).toUpperCase() : '',
+      cpInitStyle: { width: mob?46:64, height: mob?46:64, borderRadius: mob?23:32, background: cp?.accent||CR, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: mob?15:20, fontWeight: 900, color: '#fff', flexShrink: 0 },
+      cpCardStyle: { background: cp?.lbg||'#fff', border: `2px solid ${cp?.accent||CR}22`, borderRadius: 16, padding: mob?'16px':'24px', cursor: 'pointer' },
+      cpInnerStyle: { display: 'flex', alignItems: mob?'center':'flex-start', gap: mob?14:24 },
+      cpNameStyle: { fontSize: mob?17:22, fontWeight: 800, color: N },
+      cpCouponStyle: { display: 'inline-block', background: cp?.accent||CR, color: '#fff', borderRadius: 7, padding: mob?'4px 12px':'6px 18px', fontSize: mob?14:20, fontWeight: 900 },
+      cdDots: this.P.map((_, i) => ({ style: { width: i === ci ? 20 : 6, height: 6, borderRadius: 3, background: i === ci ? CR : '#CBD5E1', transition: 'all 0.4s' } })),
+
+      // Partner grids
+      partnerPreviewGrid: { display: 'grid', gridTemplateColumns: mob ? '1fr 1fr' : 'repeat(3, 1fr)', gap: mob?10:16, marginTop: mob?12:16 },
+      previewPartners: mob ? SP.slice(0, 4) : SP,
+      allPartners: SP,
+
+      // Trust strip
+      trustWrap: { background: '#fff', margin: mob ? '20px 16px 0' : '40px 0 0', padding: mob ? '14px 16px' : '28px 48px', boxShadow: '0 2px 8px rgba(22,32,77,0.05)' },
+      trustGap: mob ? '8px' : '24px',
+      trustItemStyle: mob ? 'flex-direction:column;text-align:center' : '',
+
+      // Footer
+      footerWrap: { background: N, padding: mob ? '24px 16px 16px' : '56px 48px 40px', marginTop: mob ? 24 : 0 },
+      footerGrid: { display: 'grid', gridTemplateColumns: mob ? '1fr' : '2fr 1fr 1.5fr 1fr', gap: mob ? 28 : 40, marginBottom: mob ? 24 : 40 },
+      footerLogoStyle: { height: mob?90:120, objectFit: 'contain', background: '#fff', borderRadius: 14, padding: mob?'10px 16px':'14px 22px' },
+      footerDivider: { height: 1, background: 'rgba(255,255,255,0.1)', marginBottom: mob ? 16 : 24 },
+
+      // Offers grid
+      offersGrid: { display: 'grid', gridTemplateColumns: mob ? '1fr 1fr' : 'repeat(3, 1fr)', gap: mob ? 10 : 16, marginTop: mob ? 0 : 0 },
+      featuredPartner: fp,
+      gridPartners: SP.slice(1),
+      featuredTileStyle: { background: fp.lbg, borderRadius: mob?18:22, border: `2px solid ${fp.accent}33`, cursor: 'pointer', marginBottom: mob?12:16, position: 'relative', overflow: 'hidden' },
+      featuredBadgeStyle: { background: fp.accent, color: '#fff', borderRadius: 8, padding: '3px 12px', fontSize: 10, fontWeight: 800, letterSpacing: '0.06em' },
+      featuredBarStyle: { background: fp.accent, padding: mob?'16px':'20px 24px', display: 'flex', alignItems: 'center', gap: mob?12:16 },
+      featuredInitStyle: { width: mob?48:64, height: mob?48:64, borderRadius: mob?24:32, background: 'rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: mob?16:22, fontWeight: 900, color: '#fff', flexShrink: 0 },
+      featuredNameStyle: { fontSize: mob?19:26, fontWeight: 900, color: '#fff' },
+      featuredBodyStyle: { padding: mob?'16px':'20px 24px' },
+      featuredCouponStyle: { display: 'inline-block', background: fp.accent, color: '#fff', borderRadius: 8, padding: mob?'5px 14px':'8px 20px', fontSize: mob?17:22, fontWeight: 900 },
+
+      // Partner detail
+      apName: ap?.name||'', apCat: ap?.cat||'', apDesc: ap?.desc||'',
+      apCoupon: ap?.coupon||'', apCode: ap?.code||'', apMin: ap?.min||'', apValidity: ap?.validity||'',
+      apInitial: ap ? ap.name.slice(0,2).toUpperCase() : '',
+      apHeaderStyle: { background: ap?.accent||N },
+      apHeaderInner: { maxWidth: mob ? 'none' : 1200, margin: '0 auto', padding: mob ? '36px 20px 28px' : '56px 48px', display: 'flex', alignItems: mob ? 'center' : 'center', flexDirection: mob ? 'column' : 'row', textAlign: mob ? 'center' : 'left', gap: mob ? 0 : 28 },
+      apInitBigStyle: { width: mob?68:88, height: mob?68:88, borderRadius: mob?34:44, background: 'rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: mob?22:28, fontWeight: 900, color: '#fff', marginBottom: mob?12:0, flexShrink: 0 },
+      apNameStyle: { fontSize: mob?22:32, fontWeight: 900, color: '#fff' },
+      detailBodyStyle: mob
+        ? { padding: '20px 16px' }
+        : { maxWidth: 1200, margin: '0 auto', padding: '48px 48px', display: 'grid', gridTemplateColumns: '1fr 420px', gap: 48 },
+      detailLeftStyle: mob ? {} : {},
+      detailRightStyle: mob ? { marginTop: 20 } : {},
+      apBigCouponStyle: { display: 'inline-block', background: ap?.accent||N, color: '#fff', borderRadius: 10, padding: mob?'8px 24px':'12px 32px', fontSize: mob?24:32, fontWeight: 900 },
+      apCodeBoxStyle: { background: `${ap?.accent||N}10`, border: `1.5px dashed ${ap?.accent||N}50`, borderRadius: 10, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' },
+      apShopStyle: { width: '100%', padding: '16px', background: ap?.accent||N, color: '#fff', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: 'pointer' },
+      apCopyStyle: { fontSize: 12, fontWeight: 700, color: s.copied ? '#059669' : ap?.accent||N },
+      copyApCode: () => { if (ap) { navigator.clipboard?.writeText(ap.code); this.setState({ copied: true }); setTimeout(() => this.setState({ copied: false }), 2000); } },
+      shopApPartner: () => { if (ap?.url) window.open(ap.url, '_blank'); },
+
+      // Dashboard
+      dashHeroPad: mob ? '24px 20px 28px' : '40px 48px',
+      dashHeroInner: mob
+        ? {}
+        : { maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'start' },
+      dashNameStyle: { fontSize: mob?22:32, fontWeight: 900, color: '#fff', marginBottom: mob?16:0 },
+      primeBadgeStyle: { background: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: 14 },
+      dashBodyStyle: mob
+        ? { padding: '0' }
+        : { maxWidth: 1200, margin: '0 auto', padding: '40px 48px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 },
+      dashLeftStyle: mob ? { padding: '16px 16px 0' } : {},
+      dashRightStyle: mob ? { padding: '16px 16px 20px' } : {},
+
+      // Mobile nav
+      navHomeStyle: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, cursor: 'pointer', flex: 1, padding: '10px 0', color: s.screen === 'home' ? N : '#94A3B8', background: 'none', border: 'none', fontWeight: s.screen === 'home' ? 700 : 400 },
+      navPayStyle: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, cursor: 'pointer', flex: 1, padding: '10px 0', color: PAY.includes(s.screen) ? CR : '#94A3B8', background: 'none', border: 'none', fontWeight: PAY.includes(s.screen) ? 700 : 400 },
+      navOffersStyle: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, cursor: 'pointer', flex: 1, padding: '10px 0', color: s.screen === 'offers' ? N : '#94A3B8', background: 'none', border: 'none', fontWeight: s.screen === 'offers' ? 700 : 400 },
+      navDashStyle: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, cursor: 'pointer', flex: 1, padding: '10px 0', color: s.screen === 'dashboard' ? N : '#94A3B8', background: 'none', border: 'none', fontWeight: s.screen === 'dashboard' ? 700 : 400 },
+      navHomeDot: { width: 4, height: 4, borderRadius: 2, background: s.screen === 'home' ? N : 'transparent', marginTop: 2 },
+      navPayDot: { width: 4, height: 4, borderRadius: 2, background: PAY.includes(s.screen) ? CR : 'transparent', marginTop: 2 },
+      navOffersDot: { width: 4, height: 4, borderRadius: 2, background: s.screen === 'offers' ? N : 'transparent', marginTop: 2 },
+      navDashDot: { width: 4, height: 4, borderRadius: 2, background: s.screen === 'dashboard' ? N : 'transparent', marginTop: 2 },
+    };
+  }
+}
+</script>
+</body>
+</html>
