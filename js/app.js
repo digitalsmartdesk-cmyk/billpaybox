@@ -337,6 +337,31 @@ function renderPayWidget() {
 }
 
 // ===== Screens =====
+function renderCarouselBlock() {
+  const partner = PARTNERS[state.carouselIdx];
+  return `
+    <div class="carousel-card" style="--accent:${partner.accent};--lbg:${partner.lbg};--accent-soft:${hexToRgba(partner.accent, 0.13)}" data-action="goOffers">
+      <div class="carousel-card-inner">
+        <div class="carousel-avatar">${initials(partner.name)}</div>
+        <div style="flex:1">
+          <p class="carousel-name">${partner.name}</p>
+          <p class="carousel-cat">${partner.cat}</p>
+          <p class="carousel-desc">${partner.desc}</p>
+        </div>
+        <div class="carousel-side">
+          <div class="carousel-coupon">${partner.coupon}</div>
+          <p class="use-code">Use code</p>
+          <p class="code">${partner.code}</p>
+          <span class="view-all">View all offers →</span>
+        </div>
+      </div>
+    </div>
+    <div class="carousel-dots">
+      ${PARTNERS.map((p, i) => `<div class="dot${i === state.carouselIdx ? ' is-active' : ''}"></div>`).join('')}
+    </div>
+  `;
+}
+
 function renderHome() {
   const partner = PARTNERS[state.carouselIdx];
   return `
@@ -399,25 +424,7 @@ function renderHome() {
           <h2 class="section-head">Partner Offers</h2>
           <span class="partner-offer-tag">PARTNER OFFER</span>
         </div>
-        <div class="carousel-card" style="--accent:${partner.accent};--lbg:${partner.lbg};--accent-soft:${hexToRgba(partner.accent, 0.13)}" data-action="goOffers">
-          <div class="carousel-card-inner">
-            <div class="carousel-avatar">${initials(partner.name)}</div>
-            <div style="flex:1">
-              <p class="carousel-name">${partner.name}</p>
-              <p class="carousel-cat">${partner.cat}</p>
-              <p class="carousel-desc">${partner.desc}</p>
-            </div>
-            <div class="carousel-side">
-              <div class="carousel-coupon">${partner.coupon}</div>
-              <p class="use-code">Use code</p>
-              <p class="code">${partner.code}</p>
-              <span class="view-all">View all offers →</span>
-            </div>
-          </div>
-        </div>
-        <div class="carousel-dots">
-          ${PARTNERS.map((p, i) => `<div class="dot${i === state.carouselIdx ? ' is-active' : ''}"></div>`).join('')}
-        </div>
+        <div id="carousel-block">${renderCarouselBlock()}</div>
       </div>
 
       <div class="section-wrap">
@@ -837,7 +844,8 @@ document.body.addEventListener('input', (e) => {
 // ===== Timers =====
 function tickCarousel() {
   state.carouselIdx = (state.carouselIdx + 1) % PARTNERS.length;
-  render();
+  const el = document.getElementById('carousel-block');
+  if (el) el.innerHTML = renderCarouselBlock();
 }
 function tickCountdown() {
   let { d, h, m, s } = state.countdown;
@@ -846,7 +854,10 @@ function tickCountdown() {
   if (m < 0) { m = 59; h--; }
   if (h < 0) { h = 23; d--; }
   state.countdown = d < 0 ? { d: 0, h: 0, m: 0, s: 0 } : { d, h, m, s };
-  render();
+  const vals = [pad2(state.countdown.d), pad2(state.countdown.h), pad2(state.countdown.m), pad2(state.countdown.s)];
+  document.querySelectorAll('.campaign-countdown .digit').forEach((digitEl, i) => {
+    if (vals[i] !== undefined) digitEl.textContent = vals[i];
+  });
 }
 
 // ===== Boot =====
